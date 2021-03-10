@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-4">
+            <input type="text"
+                   id="hostnameInput"
+                   size="20"
+                   placeholder="Search for a hostname">
+        </div>
+        <div class="col-2">
+            <button class="btn btn-success" id="getByHostname">Search Hostname</button>
+        </div>
+        <div class="col-4">
+            <label>Start Time</label>
+            <input type="text"
+                   id="startTime"
+                   placeholder="Start time dd/mm/yyyy:hh:mm:ss">
+            <br>
+            <label>End Time </label>
+            <input type="text"
+                   id="endTime"
+                   placeholder="End time dd/mm/yyyy:hh:mm:ss">
+        </div>
+
+        <div class="col-2">
+            <button class="btn btn-success" id="searchTimeRange">Search Time range</button>
+        </div>
+    </div>
+    <div>
+        <br>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#time_interval_stats">
+            View stats by time interval
+        </button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#reqbystatuscode">
+            Total Requests By Status Code
+        </button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top_req_by_resource">
+            View stats by top resources by request
+        </button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#latest_time_status_code_host">
+            Last time for status code per host
+        </button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#reqby10min">
+            Total Requests in Last 10 Minutes
+        </button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#respIntervals">
+            Requests taking more than 2/5/10 seconds to respond
+        </button>
+    </div>
+    <div id="time_interval_stats" class="collapse">
+        <br>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#dailystats">Most requested Daily</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#weeklystats">Most requested Weekly</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#monthlystats">Most requested Monthly</button>
+    </div>
+    <div id="top_req_by_resource" class="collapse">
+        <br>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top5upstream">Top 5 Upstream IP</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top5host">Top 5 Hosts</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top5body_bytes">Top 5 Response Body Sizes</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top5path">Top 5 Paths</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top5response_time">Top 5 Largest Response Times</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top5status_per_host">Top 5 Status Codes per Host</button>
+    </div>
+    <div id="dailystats" class="collapse">
+        <h5>Daily</h5>
+        <br>
+        <h6> Most Requested Hosts by date</h6>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Date</th>
+                <th>Host</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.time_stats.daily_stats.hosts %}
+            <tr>
+                <td>{{ record["time_interval"] }}</td>
+                <td>{{ record["host"] }}</td>
+                <td>{{ record["requests"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h6> Most Requested Upstream IP by date</h6>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Date</th>
+                <th>Upstream IP</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.time_stats.daily_stats.upstream_ip %}
+            <tr>
+                <td>{{ record["time_interval"] }}</td>
+                <td>{{ record["upstream_ip"] }}</td>
+                <td>{{ record["requests"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h6> Most Requested Path by date</h6>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Date</th>
+                <th>Path</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.time_stats.daily_stats.path %}
+            <tr>
+                <td>{{ record["time_interval"] }}</td>
+                <td>{{ record["path"] }}</td>
+                <td>{{ record["requests"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="weeklystats" class="collapse">
+        <h5>Weekly Statistics</h5>
+        <br>
+        <h6> Most Requested Hosts by week number</h6>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Week Number</th>
+                <th>Host</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.time_stats.weekly_stats.hosts %}
+            <tr>
+                <td>{{ record["time_interval"] }}</td>
+                <td>{{ record["host"] }}</td>
+                <td>{{ record["requests"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h6> Most Requested Upstream IP by Week</h6>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Week Number</th>
+                <th>Upstream IP</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.time_stats.weekly_stats.upstream_ip %}
+            <tr>
+                <td>{{ record["time_interval"] }}</td>
+                <td>{{ record["upstream_ip"] }}</td>
+                <td>{{ record["requests"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h6> Most Requested Path by Week</h6>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Week Number</th>
+                <th>Path</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.time_stats.weekly_stats.path %}
+            <tr>
+                <td>{{ record["time_interval"] }}</td>
+                <td>{{ record["path"] }}</td>
+                <td>{{ record["requests"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="monthlystats" class="collapse">
+        <h5>Monthly Statistics</h5>
+        <br>
+        <h6> Most Requested Hosts by Month</h6>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Month</th>
+                <th>Host</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.time_stats.monthly_stats.hosts %}
+            <tr>
+                <td>{{ record["time_interval"] }}</td>
+                <td>{{ record["host"] }}</td>
+                <td>{{ record["requests"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h6> Most Requested Upstream IP by Month</h6>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Month</th>
+                <th>Upstream IP</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.time_stats.monthly_stats.upstream_ip %}
+            <tr>
+                <td>{{ record["time_interval"] }}</td>
+                <td>{{ record["upstream_ip"] }}</td>
+                <td>{{ record["requests"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h6> Most Requested Path by Month</h6>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Month</th>
+                <th>Path</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.time_stats.monthly_stats.path %}
+            <tr>
+                <td>{{ record["time_interval"] }}</td>
+                <td>{{ record["path"] }}</td>
+                <td>{{ record["requests"] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="reqbystatuscode" class="collapse">
+        <h5>Total requests by Status Code</h5>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Status Code</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.total_req_status_code %}
+            <tr>
+                <td>{{ record[0] }}</td>
+                <td>{{ record[1] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="top5upstream" class="collapse">
+        <h5>Top 5 Upstream IP by Requests</h5>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Upstream IP</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.top_req_by_resource.upstream_ip %}
+            <tr>
+                <td>{{ record[0] }}</td>
+                <td>{{ record[1] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="top5host" class="collapse">
+        <h5>Top 5 Hosts by Requests</h5>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Host Name</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.top_req_by_resource.host %}
+            <tr>
+                <td>{{ record[0] }}</td>
+                <td>{{ record[1] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="top5body_bytes" class="collapse">
+        <h5>Top 5 Response Body sizes in Bytes by Requests</h5>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Response Body Size in Bytes</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.top_req_by_resource.bodyBytesSent %}
+            <tr>
+                <td>{{ record[0] }} bytes</td>
+                <td>{{ record[1] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="top5path" class="collapse">
+        <h5>Top 5 Paths by Requests</h5>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Path</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.top_req_by_resource.path %}
+            <tr>
+                <td>{{ record[0] }}</td>
+                <td>{{ record[1] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="top5response_time" class="collapse">
+        <h5>Top 5 Longest Response Times </h5>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Response Time</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.top_req_by_resource.response_time %}
+            <tr>
+                <td>{{ record[0] }}</td>
+                <td>{{ record[1] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div id="top5status_per_host" class="collapse">
+        <h5>Top 5 Status codes per Host</h5>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Host Name</th>
+                <th>Status Code</th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.top_req_by_resource.code_by_host %}
+            {% for status in stats.top_req_by_resource.code_by_host[record] %}
+                <tr>
+                    <td>{{ record }}</td>
+                    <td>{{ status[0] }}</td>
+                    <td>{{ status[1] }}</td>
+                </tr>
+            {% endfor %}
+            {% endfor %}
+        </table>
+    </div>
+    <div id ="latest_time_status_code_host" class="collapse">
+        <h5>Latest Time per Status codes per Host</h5>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Host Name</th>
+                <th>Status Code</th>
+                <th>Time</th>
+            </tr>
+            {% for record in stats.status_code_latest_time %}
+            {% for status in record[1] %}
+            <tr>
+                <td>{{ record[0] }}</td>
+                <td>{{ status[0] }}</td>
+                <td>{{ status[1] }}</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+        </table>
+    </div>
+    <div id="reqby10min" class="collapse">
+    <br>
+    <h5>Number of requests in the last 10 minutes: {{ stats['req_count_last_10_min'] }}</h5>
+</div>
+    <div id="respIntervals" class="collapse">
+        <h5>Number of requests taking more than 2/5/10 seconds to respond</h5>
+        <table class="table striped table-hover">
+            <tr>
+                <th>Response time greater than </th>
+                <th>Request Count</th>
+            </tr>
+            {% for record in stats.req_response_longer_than_time_interval %}
+            <tr>
+                <td>{{ record }}</td>
+                <td>{{ stats.req_response_longer_than_time_interval[record] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<script>
+$( "#getByHostname" ).click(function(){
+    let hostname=$("#hostnameInput").val();
+    let url="{{ url_for('stats') }}"+"?host="+hostname;
+    window.location.href=url;
+})
+$( "#searchTimeRange" ).click(function(){
+    let start_time=$("#startTime").val();
+    let end_time=$("#endTime").val();
+    let url="{{ url_for('stats') }}"+"?start_time="+start_time+"&end_time="+end_time;
+    window.location.href=url;
+})
+</script>
+{% endblock %}
