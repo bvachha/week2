@@ -1,0 +1,388 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>LogStat - CGI</title>
+</head>
+<body>
+<hr>
+<div class="container-fluid">
+    <div>
+        <br>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#time_interval_stats">
+            View stats by time interval
+        </button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#reqbystatuscode">
+            Total Requests By Status Code
+        </button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top_req_by_resource">
+            View stats by top resources by request
+        </button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#latest_time_status_code_host">
+            Last time for status code per host
+        </button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#reqby10min">
+            Total Requests in Last 10 Minutes
+        </button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#respIntervals" aria-expanded="true">
+            Requests taking more than 2/5/10 seconds to respond
+        </button>
+    </div>
+
+    <div id="time_interval_stats" class="collapse">
+        <br>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#dailystats">Most requested Daily</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#weeklystats">Most requested Weekly</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#monthlystats">Most requested Monthly</button>
+    </div>
+    <div id="top_req_by_resource" class="collapse">
+        <br>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top5upstream">Top 5 Upstream IP</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top5host">Top 5 Hosts</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top5body_bytes">Top 5 Response Body Sizes</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top5path">Top 5 Paths</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top5response_time">Top 5 Largest Response Times</button>
+        <button class="btn btn-primary" data-toggle="collapse" data-target="#top5status_per_host">Top 5 Status Codes per Host</button>
+    </div>
+
+    <div id="dailystats" class="collapse">
+        <h5>Daily</h5>
+        <br>
+        <h6> Most Requested Hosts by date</h6>
+        <table class="table striped table-hover">
+            <tbody>
+                <tr>
+                    <th>Date</th>
+                    <th>Host</th>
+                    <th>Request Count</th>
+                </tr>
+                <!-- TMPL_LOOP NAME=DAILY_HOST -->
+                <tr>
+                    <td><!-- TMPL_VAR NAME=DATE --></td>
+                    <td><!-- TMPL_VAR NAME=HOST --></td>
+                    <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+                </tr>
+                </TMPL_LOOP>
+            </tbody>
+        </table>
+
+        <h6> Most Requested Upstream IP by date</h6>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Date</th>
+                <th>Upstream IP</th>
+                <th>Request Count</th>
+            </tr>
+            <!-- TMPL_LOOP NAME=DAILY_UPSTREAM_IP -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=DATE --></td>
+                <td><!-- TMPL_VAR NAME=UPSTREAM_IP --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>            
+        </tbody></table>
+
+        <h6> Most Requested Path by date</h6>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Date</th>
+                <th>Path</th>
+                <th>Request Count</th>
+            </tr>
+            <!-- TMPL_LOOP NAME=DAILY_PATH -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=DATE --></td>
+                <td><!-- TMPL_VAR NAME=PATH --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>          
+        </tbody></table>
+    </div>
+    <div id="weeklystats" class="collapse">
+        <h5>Weekly Statistics</h5>
+        <br>
+        <h6> Most Requested Hosts by week number</h6>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Week Number</th>
+                <th>Host</th>
+                <th>Request Count</th>
+            </tr>
+            
+            <!-- TMPL_LOOP NAME=WEEKLY_HOST -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=WEEK --></td>
+                <td><!-- TMPL_VAR NAME=HOST --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>
+            </tbody>
+        </table>
+
+        <h6> Most Requested Upstream IP by Week</h6>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Week Number</th>
+                <th>Upstream IP</th>
+                <th>Request Count</th>
+            </tr>
+            
+            <!-- TMPL_LOOP NAME=WEEKLY_UPSTREAM -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=WEEK --></td>
+                <td><!-- TMPL_VAR NAME=UPSTREAM_IP --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>     
+            </tbody>
+        </table>
+
+        <h6> Most Requested Path by Week</h6>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Week Number</th>
+                <th>Path</th>
+                <th>Request Count</th>
+            </tr>
+            
+            <!-- TMPL_LOOP NAME=WEEKLY_PATH -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=WEEK --></td>
+                <td><!-- TMPL_VAR NAME=PATH --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="monthlystats" class="collapse">
+        <h5>Monthly Statistics</h5>
+        <br>
+        <h6> Most Requested Hosts by Month</h6>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Month</th>
+                <th>Host</th>
+                <th>Request Count</th>
+            </tr>            
+            <!-- TMPL_LOOP NAME=MONTHLY_HOST -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=MONTH --></td>
+                <td><!-- TMPL_VAR NAME=HOST --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>
+        </tbody></table>
+
+        <h6> Most Requested Upstream IP by Month</h6>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Month</th>
+                <th>Upstream IP</th>
+                <th>Request Count</th>
+            </tr>
+            
+            <!-- TMPL_LOOP NAME=MONTHLY_UPSTREAM_IP -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=MONTH --></td>
+                <td><!-- TMPL_VAR NAME=UPSTREAM_IP --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>
+        </tbody></table>
+        <h6> Most Requested Path by Month</h6>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Month</th>
+                <th>Path</th>
+                <th>Request Count</th>
+            </tr>
+            <!-- TMPL_LOOP NAME=MONTHLY_PATH -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=MONTH --></td>
+                <td><!-- TMPL_VAR NAME=PATH --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>
+        </tbody></table>
+    </div>
+
+    <div id="reqbystatuscode" class="collapse">
+        <h5>Total requests by Status Code</h5>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Status Code</th>
+                <th>Request Count</th>
+            </tr>
+            <!-- TMPL_LOOP NAME=TOTAL_REQ_BY_STATUS -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=STATUS_CODE --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>
+            
+        </tbody></table>
+    </div>
+    <div id="top5upstream" class="collapse">
+        <h5>Top 5 Upstream IP by Requests</h5>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Upstream IP</th>
+                <th>Request Count</th>
+            </tr>
+            
+            <!-- TMPL_LOOP NAME=TOP_5_UPSTREAM -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=UPSTREAM_IP --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>
+            
+        </tbody></table>
+    </div>
+    <div id="top5host" class="collapse">
+        <h5>Top 5 Hosts by Requests</h5>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Host Name</th>
+                <th>Request Count</th>
+            </tr>            
+            <!-- TMPL_LOOP NAME=TOP_5_HOST -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=HOST --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>
+        </tbody></table>
+    </div>
+    <div id="top5body_bytes" class="collapse">
+        <h5>Top 5 Response Body sizes in Bytes by Requests</h5>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Response Body Size in Bytes</th>
+                <th>Request Count</th>
+            </tr>
+            <!-- TMPL_LOOP NAME=TOP_5_BODYBYTES -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=BODY_BYTES --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>
+        </tbody></table>
+    </div>
+    <div id="top5path" class="collapse">
+        <h5>Top 5 Paths by Requests</h5>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Path</th>
+                <th>Request Count</th>
+            </tr>
+            <!-- TMPL_LOOP NAME=TOP_5_PATH -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=PATH --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>
+        </tbody></table>
+    </div>
+    <div id="top5response_time" class="collapse">
+        <h5>Top 5 Longest Response Times </h5>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Response Time</th>
+                <th>Request Count</th>
+            </tr>
+            <!-- TMPL_LOOP NAME=TOP_5_RESP_TIME -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=RESP_TIME --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>
+        </tbody></table>
+    </div>
+    <div id="top5status_per_host" class="collapse">
+        <h5>Top 5 Status codes per Host</h5>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Host Name</th>
+                <th>Status Code</th>
+                <th>Request Count</th>
+            </tr>
+            <!-- TMPL_LOOP NAME=TOP_5_STATUS_BY_HOST -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=HOST --></td>
+                <td><!-- TMPL_VAR NAME=STATUS --></td>
+                <td><!-- TMPL_VAR NAME=REQCOUNT --></td>
+            </tr>
+            </TMPL_LOOP>
+        </tbody></table>
+    </div>
+
+    <div id="latest_time_status_code_host" class="collapse">
+        <h5>Latest Time per Status codes per Host</h5>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Host Name</th>
+                <th>Status Code</th>
+                <th>Time</th>
+            </tr>
+            <!-- TMPL_LOOP NAME=TIME_STATUS_HOST -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=HOST --></td>
+                <td><!-- TMPL_VAR NAME=STATUS --></td>
+                <td><!-- TMPL_VAR NAME=TIME --></td>
+            </tr>
+            </TMPL_LOOP>
+            </tbody></table>
+    </div>
+    <div id="reqby10min" class="collapse">
+    <br>
+    <h5>Number of requests in the last 10 minutes</h5>
+    <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Source IP</th>
+                <th>Time</th>
+                <th>Request</th>
+            </tr>
+            <!-- TMPL_LOOP NAME=REQ_LAST_10_MIN -->
+            <tr>
+                <td><!-- TMPL_VAR NAME=IP --></td>
+                <td><!-- TMPL_VAR NAME=TIME --></td>
+                <td><!-- TMPL_VAR NAME=REQ --></td>
+            </tr>
+            </TMPL_LOOP>
+            </tbody></table>
+    </div>
+</div>
+    <div id="respIntervals" class="collapse">
+        <h5>Number of requests taking more than 2/5/10 seconds to respond</h5>
+        <table class="table striped table-hover">
+            <tbody><tr>
+                <th>Response time greater than </th>
+                <th>Request Count</th>
+            </tr>
+            
+            <tr>
+                <td>2 Seconds</td>
+                <td><TMPL_VAR NAME=gt2></td>
+            </tr>
+            
+            <tr>
+                <td>5 Seconds</td>
+                <td><TMPL_VAR NAME=gt5></td>
+            </tr>
+            
+            <tr>
+                <td>10 Seconds</td>
+                <td><TMPL_VAR NAME=gt10></td>
+            </tr>
+            
+        </tbody></table>
+    </div>
+</div>
+</body>
+</html>
