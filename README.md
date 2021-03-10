@@ -72,3 +72,59 @@ docker build -t perl-logstat .
 sudo docker run -it -p <available_local_port_number>:80/tcp perl-logstat:latest 
 ```
 5. If everything went as expected, you should be dropped into a root prompt for the running container for your image. You can now navigate to ```http://127.0.0.1:<available_local_port_number>/cgi-bin/log-parser.cgi``` to view the statistics from the perl application.
+
+## Python Flask Web app
+The python flask server introduces some additional functions as compared to the Perl web application. There is a capability to upload '.log' and '.txt' files. We also have the ability to filter on the date range we want as well as the hostname. The details and caveats will be explained below. 
+
+First lets look at setting up the web application
+#### Web-server deployment with Docker
+1. Navigate to the diectory with the Dockerfile and resources for the python webserver at ```logStatApp``` using the command 
+``` 
+cd logStatApp 
+```
+from the root of the project directory.
+2. Start the docker build process using 
+``` 
+docker build -t python-logstat . 
+```
+This will do the following tasks
+    1. Pull an ubuntu base image
+    2. Update the apt cache
+    2. Install python and pip
+    4. Copy over the resource files to the image
+    5. Install the python dependencies for the application
+    6. Export the applications local port to the host
+    7. Setup the initialization command to run the server on container deployment
+3. Once the container image is created with no errors, you can use the following command to start the container and bind a host port to the container port. In this example we use port 8080 but it can be any free port on your host system. 
+```
+sudo docker run -it -p 8080:5000/tcp python-logstat:latest
+````
+4. Once the container is deployed, you can access the application through the browser on the address ```http://127.0.0.1:8080```
+#### Using the web application
+* If this is the first time visiting the application after the container is started or restarted, you will see a message asking you to upload a logfile. As there are no additional volumes mounted, the data uploaded will not persist across container reboots. 
+* Clicking the upload button will take you to the upload page where you can select a file to upload. The file must be a .txt or a .log file. Any other file types will not be accepted. The format of the logfile should match the below given example format or the parser will not parse the file and return an error message when you try to view the stats page.
+
+```
+111.111.111.111 12/Feb/2021:06:52:54 +0000 "GET /xyz/abc/efg/sed HTTP/1.1" 200 0.979 10.11.12.15:443 1407 "-" "User-agent string" TLSv1.2/ECDHE-RSA-AES256-GCM-SHA384 62b5fea87b05d59b-AEN application/json; charset=utf-8 host1.domain.com
+```
+* where 
+    1. 111.111.111.111 is the source IP
+    2. 12/Feb/2021:06:52:54 is the date and time information
+    3. +0000 is the timezone information
+    4. GET is the HTTP Method
+    5. /xyz/abc/efg/sed is the request path 
+    6. HTTP/1.1 is the http protocol version 
+    7.200 is the response status code 
+    8. 0.979 is the response time in seconds 
+    9. 10.11.12.15:443 is the upstream server and port
+    10. 1407 is the size of the response body in bytes
+    11. "User-agent string" is the user agent string of the requesting browser
+    12. TLSv1.2/ECDHE-RSA-AES256-GCM-SHA384 62b923587b05d59b-BOM is the SSL/TLS information
+    13. application/json; charset=utf-8  is the content type
+    14. host1.domain.com is the hostname
+* Once a properly formatted logfile with the correct extension is uploaded, a new 'View Stats' will appear on the homepage. Clicking this button takes you to the stats page where you can view the various statistics gathered from the logfile. 
+* There are two ways to filter information in the statistics:   
+    1. _By Hostname:_ If you enter a valid hostname, all the statistics are filtered to only display the statistics for log entries matching that hostname
+    2. _By Date Time Range:_ The application accepts a start and end date and filters and processes only those results that are within the specified limits. 
+    3. NOTE: Entering invalid hostnames, malformed date ranges or valid ranges with no logs matching them will return a message asking you to check the ranges. If you see this message and are sure your date ranges/hostname data is correct, then it is possible that there is no data matching these values in the log file that was uploaded.
+    
