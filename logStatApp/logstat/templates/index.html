@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Welcome to the Logstat application</h2>
+To use the application please upload an nginx logfile using the upload button and then view the statistics
+{% if stats_available %}
+<div>
+    <button class="btn btn-primary" onclick="window.location.href='{{ url_for('stats') }}';"> View Statistics</button>
+</div>
+{% else %}
+<h3>There does not seem to be a logfile uploaded. Upload a logfile first.</h3>
+{% endif %}
+<br>
+<div>
+    <button class="btn btn-primary" id="upload_button" onclick="window.location.href='{{ url_for('upload') }}';">
+        Upload Log file
+    </button>
+</div>
+{% endblock %}
