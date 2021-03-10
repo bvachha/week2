@@ -1,0 +1,30 @@
+<html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    {% if title %}
+    <title>{{ title }} - LogStat</title>
+    {% else %}
+    <title>LogStat</title>
+    {% endif %}
+</head>
+<body>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<hr>
+{% block content %}
+{% endblock %}
+</body>
+</html>
