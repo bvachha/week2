@@ -299,7 +299,7 @@ echo "-----------------------------------------------------------------"
 echo "Requests for last 10 minutes"
 echo "-----------------------------------------------------------------"
 echo ""
-last_entry=$(tail access.log -n1 | awk '{print $2}' | sed -e 's/:/ /' -e 's/\//-/g' | xargs -I {} date --date='{}' -u)
+last_entry=$(tail $1 -n1 | awk '{print $2}' | sed -e 's/:/ /' -e 's/\//-/g' | xargs -I {} date --date='{}' -u)
 start_time=$( date --date="$last_entry -10 minutes" -u +%s)
 tac $1 \
 |awk -v start=$start_time '{ 
