@@ -1,10 +1,13 @@
-from datetime import datetime
-
 from logstat.statsParsers.time_stats import get_time_stats, get_requests_last_10_min
 from logstat.statsParsers.top_requests_by_resource_type import get_top_requests_by_resource
 
 
 def get_req_by_stat_code(data):
+    """
+    aggregate the log data by number of requests per request code
+    :param data: log data
+    :return: sorted list of status code to requests pairs
+    """
     result = {}
     for record in data:
         status = str(record.get("status_code"))
@@ -15,6 +18,11 @@ def get_req_by_stat_code(data):
 
 
 def get_latest_time_by_stat_code(data):
+    """
+    gets the last time at which a status code was returned by the server for each host
+    :param data: log data records
+    :return: list of status codes and the last time they were sent by each host
+    """
     result = {}
     for record in data:
         status = int(record.get("status_code"))
@@ -35,6 +43,11 @@ def get_latest_time_by_stat_code(data):
 
 
 def get_req_resp_longer_than_intervals(data):
+    """
+    determines the number of requests greater than a given time period
+    :param data: log data
+    :return: results of stats
+    """
     result = {
         "2 Seconds": 0,
         "5 Seconds": 0,
@@ -52,6 +65,12 @@ def get_req_resp_longer_than_intervals(data):
 
 
 def get_stats(data):
+    """
+    stats aggregator, will create a dict of different statistics groups and return the final results to the caller
+    function
+    :param data: log data
+    :return: compiled dict of statistics
+    """
     stats = {
         "time_stats": get_time_stats(data),
         "total_req_status_code": get_req_by_stat_code(data),

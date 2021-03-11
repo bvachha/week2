@@ -32,4 +32,5 @@ dictConfig({
 app = Flask(__name__)
 app.config.from_object(Config)  # load config into flask app
 
+# import the routes for the application
 from logstat import routes

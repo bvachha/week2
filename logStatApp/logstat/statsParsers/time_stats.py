@@ -1,11 +1,26 @@
+from datetime import datetime
+from typing import List, Dict
+
+
 def get_time_intervals(data):
+    """
+    gets the unique date, week and months from the data records
+    :param data: log data
+    :return: unique dates, week numbers and month names present in the logs
+    """
     dates = list(set(record['timestamp'].date() for record in data))
     weeks = list(set(record['timestamp'].date().isocalendar()[1] for record in data))
     months = list(set(record['timestamp'].strftime("%b") for record in data))
     return dates, weeks, months
 
 
-def get_daily_stats(dates, data):
+def get_daily_stats(dates: List[datetime], data: List[Dict]):
+    """
+    gets the top host, path and upstream ip address for a given date
+    :param dates: list of date values
+    :param data: list of log records
+    :return: date wise stats for each specified resource type
+    """
     stats_data = {}
     for record in data:
         for date in dates:
@@ -30,10 +45,16 @@ def get_daily_stats(dates, data):
 
 
 def aggregate_time_stats(stats_data):
+    """
+    aggregate the data and generate a new list of values with key as the resource and value being the time interval
+    and resource name
+    :param stats_data: stats data extracted
+    :return:aggregated time stats
+    """
     final_data = {
         "hosts": [],
         "upstream_ip": [],
-        "path":[]
+        "path": []
     }
     for key in stats_data.keys():
         host_counts = stats_data[key]['host_counts']
@@ -42,20 +63,6 @@ def aggregate_time_stats(stats_data):
         max_upstream_key = max(upstream_ip_counts, key=upstream_ip_counts.get)
         path_counts = stats_data[key]['path_counts']
         max_path_counts = max(path_counts, key=path_counts.get)
-        # final_data[key] = {
-        #     "max_host": {
-        #         "id": max_host_key,
-        #         "count": host_counts[max_host_key]
-        #     },
-        #     'max_upstream': {
-        #         'id': max_upstream_key,
-        #         'count': upstream_ip_counts[max_upstream_key]
-        #     },
-        #     'max_path': {
-        #         'id': max_path_counts,
-        #         'count': path_counts[max_path_counts]
-        #     }
-        # }
         final_data["hosts"].append({
             "time_interval": key,
             "host": max_host_key,
@@ -75,6 +82,12 @@ def aggregate_time_stats(stats_data):
 
 
 def get_weekly_stats(weeks, data):
+    """
+        gets the top host, path and upstream ip address for a given week number
+        :param weeks: list of week number values
+        :param data: list of log records
+        :return: date wise stats for each specified resource type
+        """
     stats_data = {}
     for record in data:
         for week_num in weeks:
@@ -100,6 +113,12 @@ def get_weekly_stats(weeks, data):
 
 
 def get_monthly_stats(months, data):
+    """
+        gets the top host, path and upstream ip address for a given month
+        :param months: list of month values
+        :param data: list of log records
+        :return: date wise stats for each specified resource type
+        """
     stats_data = {}
     for record in data:
         for month in months:
@@ -124,6 +143,11 @@ def get_monthly_stats(months, data):
 
 
 def get_requests_last_10_min(data):
+    """
+        gets the count of total requests received for the last 10 minutes
+        :param data: list of log records
+        :return: count of received requests for last 10 minutes
+        """
     counter = 0
     last_entry_time = data[-1]['timestamp']
     for record in data:
@@ -134,6 +158,11 @@ def get_requests_last_10_min(data):
 
 
 def get_time_stats(data):
+    """
+    generates the time based statistics groups
+    :param data: log data
+    :return: dict of time based stats
+    """
     dates, weeks, months = get_time_intervals(data)
     return {
         'daily_stats': get_daily_stats(dates, data),

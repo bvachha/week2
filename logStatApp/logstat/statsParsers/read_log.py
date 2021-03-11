@@ -1,7 +1,17 @@
 from datetime import datetime
+from typing import Dict
 
 
-def filter_check(time_start, time_end, host, log_line):
+def filter_check(time_start: datetime, time_end: datetime, host: str, log_line: Dict):
+    """
+    if the values for the filter args are present, will check the corresponding fields in the record and return match
+    status
+    :param time_start: start date of date range
+    :param time_end: end date and time of date range
+    :param host: hostname
+    :param log_line: log record
+    :return: true if filter matches record, else false
+    """
     if not time_start and not time_end and not host:
         return True
     elif host and log_line["host"] == host:
@@ -12,7 +22,16 @@ def filter_check(time_start, time_end, host, log_line):
         return False
 
 
-def read_log(file_path, time_start=None, time_end=None, host=None):
+def read_log(file_path: str, time_start: str = None, time_end: str = None, host: str = None):
+    """
+    reads the log file at given location and parse it into a dictionary in memory. Also supports filtering if the
+    appropriate parameters are set
+    :param file_path: path to the log file
+    :param time_start: start time in string format
+    :param time_end:  end time in string format
+    :param host: hostname to filter on
+    :return: list of dictionaries containing the data from the logfile
+    """
     data = []
     if time_start:
         time_start = datetime.strptime(time_start, "%d/%b/%Y:%H:%M:%S")

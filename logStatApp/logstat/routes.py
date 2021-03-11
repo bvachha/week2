@@ -6,14 +6,20 @@ from werkzeug.utils import redirect
 from logstat import app
 from logstat.statsParsers.read_log import read_log
 from logstat.statsParsers.stats import get_stats
+from logstat.utils import allowed_file
 
 
 @app.route("/")
 @app.route("/index")
 def index():
+    """
+    Route for the landing/default page when the application is accessed.
+    Checks if a logfile is uploaded and sets flags in the template to control visibility of stats button
+    :return: result of render template for home page
+    """
     stats_available = False
     try:
-        with(open("logstat/uploads/access.log")) as f:
+        with(open("logstat/uploads/access.log")):
             stats_available = True
     except IOError:
         app.logger.warn("No log file available yet")
@@ -22,11 +28,20 @@ def index():
 
 @app.route("/upload", methods=["GET"])
 def upload():
+    """
+    Route handler for the upload file form for uploading files to application
+    """
     return render_template('upload.html')
 
 
 @app.route('/uploader', methods=['GET', 'POST'])
 def upload_file():
+    """
+    route for the function that handles processing of uploaded file
+    checks the filename and extension details and reports any errors
+    if no errors are found, it will then save the file in the specified directory with the correct name
+    :return: redirect to index page
+    """
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -48,6 +63,12 @@ def upload_file():
 
 @app.route("/stats", methods=["GET"])
 def stats():
+    """
+    Route for the stats page. when called, calculates the stats in the log file in real time and generates and returns
+    the HTML page with the details populated. It also takes hostname or time range params from the request and uses it
+    to filter the stats before processing
+    :return: stats page
+    """
     host = request.args.get("host")
     start_time = request.args.get("start_time")
     end_time = request.args.get("end_time")
@@ -62,8 +83,3 @@ def stats():
         return "No results found matching specified query. Please ensure you enter a valid hostname or date range."
     stats_data = get_stats(log_data)
     return render_template('stats.html', stats=stats_data)
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']

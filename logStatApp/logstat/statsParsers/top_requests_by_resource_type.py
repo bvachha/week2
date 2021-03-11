@@ -1,4 +1,10 @@
 def top_requests_by_field(data, field):
+    """
+    gets the top five requested resources specified by the field in the args
+    :param data: log data
+    :param field: record field to sort by
+    :return: sorted list based on request count for the given field
+    """
     result = {}
     for record in data:
         if not result.get(record[field]):
@@ -11,6 +17,11 @@ def top_requests_by_field(data, field):
 
 
 def top_req_codes_by_host(data):
+    """
+    gathers statistics based on the top 5 status codes for each host
+    :param data: log data
+    :return:
+    """
     result = {}
     for record in data:
         host = record["host"]
@@ -29,6 +40,11 @@ def top_req_codes_by_host(data):
 
 
 def get_top_requests_by_resource(data):
+    """
+    generator function to generate top requested resources specified in the resource_list list
+    :param data: log data
+    :return:
+    """
     result = {}
     resource_list = ['upstream_ip', 'host', 'bodyBytesSent', 'path', 'response_time']
     for resource in resource_list:
